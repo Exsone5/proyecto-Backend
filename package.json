@@ -1,13 +1,26 @@
 {
-     "name": "negocio-esquina",
-     "version": "1.0.0",
-     "description": "Sistema de gestión para un negocio de esquina",
-     "main": "app.js",
-     "scripts": {
-       "start": "node app.js",
-       "test": "echo \"Error: no test specified\" && exit 1"
-     },
-     "keywords": [],
-     "author": "Juan Lucero",
-     "license": "ISC"
-   }
+  "name": "proyecto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+  "start": "node src/app.js",
+  "dev": "node --watch src/app.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Exsone5/proyecto-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Exsone5/proyecto-Backend/issues"
+  },
+  "homepage": "https://github.com/Exsone5/proyecto-Backend#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
