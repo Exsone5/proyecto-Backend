@@ -1,0 +1,102 @@
+<h2>⚡ Productos en Tiempo Real</h2>
+
+<!-- Formulario para agregar productos -->
+<div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 30px; border: 2px solid #e9ecef;">
+    <h3 style="color: #667eea; margin-bottom: 20px;">➕ Agregar Nuevo Producto</h3>
+    <form id="addProductForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Título:</label>
+            <input type="text" name="title" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Código:</label>
+            <input type="text" name="code" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+        </div>
+        <div style="grid-column: 1 / -1;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Descripción:</label>
+            <textarea name="description" required 
+                      style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; resize: vertical; min-height: 80px;"></textarea>
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Precio:</label>
+            <input type="number" name="price" step="0.01" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Stock:</label>
+            <input type="number" name="stock" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Categoría:</label>
+            <input type="text" name="category" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #495057;">Estado:</label>
+            <select name="status" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px;">
+                <option value="true">Disponible</option>
+                <option value="false">No disponible</option>
+            </select>
+        </div>
+        <div style="grid-column: 1 / -1;">
+            <button type="submit" 
+                    style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                ➕ Agregar Producto
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Lista de productos que se actualiza en tiempo real -->
+<div id="productsContainer">
+    {{#if hasProducts}}
+        <div class="products-grid">
+            {{#each products}}
+                <div class="product-card" data-id="{{this.id}}">
+                    <h3>{{this.title}}</h3>
+                    <p class="product-code">Código: {{this.code}}</p>
+                    <p>{{this.description}}</p>
+                    <p class="product-price">${{this.price}}</p>
+                    <p>
+                        <span class="product-stock">Stock: {{this.stock}} unidades</span>
+                    </p>
+                    <span class="product-category">{{this.category}}</span>
+                    <button class="delete-btn" data-id="{{this.id}}" 
+                            style="margin-top: 15px; width: 100%; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        🗑️ Eliminar
+                    </button>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state">
+            <h2>📭 No hay productos</h2>
+            <p>Agrega tu primer producto usando el formulario de arriba.</p>
+        </div>
+    {{/if}}
+</div>
+
+<!-- Socket.io Client -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTimeProducts.js"></script>
+
+<style>
+    h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 2rem;
+    }
+
+    .delete-btn:hover {
+        background: #c82333;
+        transform: scale(1.02);
+    }
+
+    button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+</style>

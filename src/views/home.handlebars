@@ -1,0 +1,43 @@
+<h2>📋 Lista de Productos</h2>
+
+{{#if hasProducts}}
+    <div class="products-grid">
+        {{#each products}}
+            <div class="product-card">
+                <h3>{{this.title}}</h3>
+                <p class="product-code">Código: {{this.code}}</p>
+                <p>{{this.description}}</p>
+                <p class="product-price">${{this.price}}</p>
+                <p>
+                    <span class="product-stock {{#if (eq this.stock 0)}}out{{else}}{{#if (lt this.stock 5)}}low{{/if}}{{/if}}">
+                        Stock: {{this.stock}} unidades
+                    </span>
+                </p>
+                <span class="product-category">{{this.category}}</span>
+                {{#if this.status}}
+                    <p style="color: #28a745; margin-top: 10px;">✅ Disponible</p>
+                {{else}}
+                    <p style="color: #dc3545; margin-top: 10px;">❌ No disponible</p>
+                {{/if}}
+            </div>
+        {{/each}}
+    </div>
+{{else}}
+    <div class="empty-state">
+        <h2>📭 No hay productos</h2>
+        <p>Aún no se han agregado productos al catálogo.</p>
+        <p style="margin-top: 20px;">
+            <a href="/realtimeproducts" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                Ir a la vista en tiempo real para agregar productos →
+            </a>
+        </p>
+    </div>
+{{/if}}
+
+<style>
+    h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 2rem;
+    }
+</style>

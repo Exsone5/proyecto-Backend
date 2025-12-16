@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "Laptop Gamer",
+    "description": "Laptop de alta gama para gaming",
+    "code": "LAP001",
+    "price": 1500,
+    "status": true,
+    "stock": 10,
+    "category": "Electrónica",
+    "thumbnails": [
+      "img1.jpg",
+      "img2.jpg"
+    ]
+  }
+]

@@ -1,11 +1,17 @@
 import express from 'express';
+import { engine } from 'express-handlebars';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
 import productsRouter from './routes/products.routes.js';
 import cartsRouter from './routes/carts.routes.js';
+import viewsRouter from './routes/views.routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
 const PORT = 8080;
 
 // Configuración para obtener __dirname en ES modules
@@ -16,6 +22,19 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Configuración de archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Configuración de Handlebars con helpers personalizados
+app.engine('handlebars', engine({
+  helpers: {
+    eq: (a, b) => a === b,
+    lt: (a, b) => a < b
+  }
+}));
+app.set('view engine', 'handlebars');
+app.set('views', path.join(__dirname, 'views'));
+
 // Verifica y crea la carpeta data si no existe
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
@@ -23,17 +42,28 @@ if (!fs.existsSync(dataDir)) {
   console.log('📁 Carpeta data creada');
 }
 
-// Rutas principales
+// Middleware para hacer el objeto io accesible en las rutas
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+// Rutas de API (PRIMERO)
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
+// Rutas de vistas (DESPUÉS)
+app.use('/', viewsRouter);
+
 // Ruta raíz para verificar que el servidor funciona
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({
     message: 'API de E-commerce funcionando correctamente',
     endpoints: {
       products: '/api/products',
-      carts: '/api/carts'
+      carts: '/api/carts',
+      home: '/',
+      realTimeProducts: '/realtimeproducts'
     }
   });
 });
@@ -46,10 +76,23 @@ app.use((req, res) => {
   });
 });
 
-// Inicia el servidor
-app.listen(PORT, () => {
-  console.log(` Servidor escuchando en el puerto ${PORT}`);
-  console.log(` http://localhost:${PORT}`);
-  console.log(` Productos: http://localhost:${PORT}/api/products`);
-  console.log(` Carritos: http://localhost:${PORT}/api/carts`);
+// Configuración de WebSockets
+io.on('connection', (socket) => {
+  console.log('🔌 Nuevo cliente conectado:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('❌ Cliente desconectado:', socket.id);
+  });
 });
+
+// Inicia el servidor
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
+  console.log(`🌐 http://localhost:${PORT}`);
+  console.log(`📦 Productos: http://localhost:${PORT}/api/products`);
+  console.log(`🛒 Carritos: http://localhost:${PORT}/api/carts`);
+  console.log(`🏠 Home: http://localhost:${PORT}`);
+  console.log(`⚡ Real Time Products: http://localhost:${PORT}/realtimeproducts`);
+});
+
+export { io };

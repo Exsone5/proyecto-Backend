@@ -63,6 +63,10 @@ router.post('/', (req, res) => {
     const productData = req.body;
     const newProduct = productManager.addProduct(productData);
 
+    // Emite evento de Socket.io para actualizar la vista en tiempo real
+    const products = productManager.getProducts();
+    req.io.emit('updateProducts', products);
+
     res.status(201).json({
       status: 'success',
       message: 'Producto creado exitosamente',
@@ -92,6 +96,10 @@ router.put('/:pid', (req, res) => {
       });
     }
 
+    // Emite evento de Socket.io para actualizar la vista en tiempo real
+    const products = productManager.getProducts();
+    req.io.emit('updateProducts', products);
+
     res.json({
       status: 'success',
       message: 'Producto actualizado exitosamente',
@@ -118,6 +126,10 @@ router.delete('/:pid', (req, res) => {
         message: `Producto con ID ${pid} no encontrado`
       });
     }
+
+    // Emite evento de Socket.io para actualizar la vista en tiempo real
+    const products = productManager.getProducts();
+    req.io.emit('updateProducts', products);
 
     res.json({
       status: 'success',
