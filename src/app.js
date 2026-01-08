@@ -2,6 +2,7 @@ import express from 'express';
 import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import mongoose from 'mongoose';  // 👈 AGREGAR
 import productsRouter from './routes/products.routes.js';
 import cartsRouter from './routes/carts.routes.js';
 import viewsRouter from './routes/views.routes.js';
@@ -18,6 +19,13 @@ const PORT = 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// CONEXIÓN A MONGODB
+const MONGODB_URI = 'mongodb+srv://juanchylucero5_db_user:uTdvwOEzQKMHIvzV@cluster0.rl29wt9.mongodb.net?appName=Cluster0';
+
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log('✅ Conectado a MongoDB'))
+  .catch((error) => console.error('❌ Error al conectar a MongoDB:', error));
+
 // Middleware para parsear JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,7 +37,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.engine('handlebars', engine({
   helpers: {
     eq: (a, b) => a === b,
-    lt: (a, b) => a < b
+    lt: (a, b) => a < b,
+    multiply: (a, b) => a * b  // 👈 AGREGAR
   }
 }));
 app.set('view engine', 'handlebars');

@@ -1,0 +1,206 @@
+<div class="container">
+  <h1>{{title}}</h1>
+  
+  <!-- Filtros y ordenamiento -->
+  <div class="filters" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+    <form method="GET" action="/products" style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <div>
+        <label for="category">Categoría:</label>
+        <select name="query" id="category" style="padding: 8px; border-radius: 5px;">
+          <option value="">Todas</option>
+          <option value="category:electronica">Electrónica</option>
+          <option value="category:ropa">Ropa</option>
+          <option value="category:hogar">Hogar</option>
+          <option value="category:deportes">Deportes</option>
+        </select>
+      </div>
+      
+      <div>
+        <label for="sort">Ordenar por precio:</label>
+        <select name="sort" id="sort" style="padding: 8px; border-radius: 5px;">
+          <option value="">Sin ordenar</option>
+          <option value="asc">Menor a mayor</option>
+          <option value="desc">Mayor a menor</option>
+        </select>
+      </div>
+      
+      <div>
+        <label for="limit">Productos por página:</label>
+        <select name="limit" id="limit" style="padding: 8px; border-radius: 5px;">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+      
+      <button type="submit" style="padding: 8px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Aplicar filtros
+      </button>
+    </form>
+  </div>
+
+  <!-- Lista de productos -->
+  <div class="products-grid">
+    {{#each products}}
+      <div class="product-card">
+        <h3>{{this.title}}</h3>
+        <p class="product-code">Código: {{this.code}}</p>
+        <p>{{this.description}}</p>
+        <p class="product-price">${{this.price}}</p>
+        <p>
+          <span class="product-stock {{#if (eq this.stock 0)}}out{{else}}{{#if (lt this.stock 5)}}low{{/if}}{{/if}}">
+            Stock: {{this.stock}} unidades
+          </span>
+        </p>
+        <span class="product-category">{{this.category}}</span>
+        
+        {{#if this.status}}
+          <p style="color: #28a745; margin-top: 10px;">✅ Disponible</p>
+        {{else}}
+          <p style="color: #dc3545; margin-top: 10px;">❌ No disponible</p>
+        {{/if}}
+        
+        <!-- Botón para agregar al carrito -->
+        <button 
+          onclick="addToCart('{{this._id}}')" 
+          style="margin-top: 15px; width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+          🛒 Agregar al carrito
+        </button>
+        
+        <!-- O enlace a detalle del producto -->
+        <a href="/products/{{this._id}}" style="display: block; text-align: center; margin-top: 10px; color: #007bff;">
+          Ver detalles
+        </a>
+      </div>
+    {{/each}}
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination" style="margin-top: 30px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+    {{#if pagination.hasPrevPage}}
+      <a href="{{pagination.prevLink}}" class="pagination-btn">← Anterior</a>
+    {{else}}
+      <span class="pagination-btn disabled">← Anterior</span>
+    {{/if}}
+    
+    <span style="font-weight: 600;">
+      Página {{pagination.page}} de {{pagination.totalPages}}
+    </span>
+    
+    {{#if pagination.hasNextPage}}
+      <a href="{{pagination.nextLink}}" class="pagination-btn">Siguiente →</a>
+    {{else}}
+      <span class="pagination-btn disabled">Siguiente →</span>
+    {{/if}}
+  </div>
+</div>
+
+<script>
+  // Función para agregar al carrito
+  async function addToCart(productId) {
+    // Por ahora, asumimos un carrito con ID fijo o lo guardamos en localStorage
+    let cartId = localStorage.getItem('cartId');
+    
+    // Si no hay carrito, crear uno
+    if (!cartId) {
+      const response = await fetch('/api/carts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      cartId = result.payload._id;
+      localStorage.setItem('cartId', cartId);
+    }
+    
+    // Agregar producto al carrito
+    try {
+      const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        alert('✅ Producto agregado al carrito');
+      } else {
+        alert('❌ Error al agregar producto');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error al agregar producto');
+    }
+  }
+</script>
+
+<style>
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+  }
+
+  .product-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #28a745;
+    margin: 10px 0;
+  }
+
+  .product-category {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .product-stock {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+
+  .product-stock.low {
+    background: #ffc107;
+    color: #000;
+  }
+
+  .product-stock.out {
+    background: #dc3545;
+    color: white;
+  }
+
+  .pagination-btn {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  .pagination-btn:hover {
+    background: #0056b3;
+  }
+
+  .pagination-btn.disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+  }
+</style>

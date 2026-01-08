@@ -5,10 +5,10 @@
   "main": "src/app.js",
   "type": "module",
   "scripts": {
-  "start": "node src/app.js",
-  "dev": "node --watch src/app.js",
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Exsone5/proyecto-Backend.git"
@@ -23,6 +23,8 @@
   "dependencies": {
     "express": "^5.1.0",
     "express-handlebars": "^8.0.1",
-   "socket.io": "^4.8.1"
+    "mongoose": "^9.1.2",
+    "mongoose-paginate-v2": "^1.9.1",
+    "socket.io": "^4.8.1"
   }
 }
